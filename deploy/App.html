@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Story Board</title>
+
+    <script type="text/javascript" src="/apps/2.0rc2/sdk.js"></script>
+
+
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+Ext.define('CustomApp', {
+    extend: 'Rally.app.TimeboxScopedApp',
+    componentCls: 'app',
+    scopeType: 'iteration',
+    onScopeChange: function(scope) {
+        this._iteration = scope.record.get('_ref');
+        if (!this.down('#addNew')) {
+	     var addNewConfig = {
+            xtype: 'rallyaddnew',
+            itemId: 'addNew',
+            recordTypes: ['User Story', 'Defect'],
+            ignoredRequiredFields: ['Name', 'ScheduleState', 'Project'],
+            showAddWithDetails: false,
+            listeners: {
+                beforecreate: this._onBeforeCreate,
+                scope: this
+            }
+        }; 
+	}
+       
+        
+        this.addNew = this.add(addNewConfig);
+        if(!this.board) {
+             this.board = this.add({
+                xtype: 'rallycardboard',
+                storeConfig: {
+                    filters: [scope.getQueryFilter()]
+                }
+            });
+        } else {
+            this.board.refresh({
+                storeConfig: {
+                    filters: [scope.getQueryFilter()]
+                }
+            });
+        }
+        this.iteration = scope.getRecord();
+    },
+    
+    _onBeforeCreate: function(addNewComponent, record) {
+    record.set('Iteration', this._iteration);
+}
+});
+            
+            Rally.launchApp('CustomApp', {
+                name:"Story Board"
+                //parentRepos:""
+            });
+
+        });
+    </script>
+
+
+
+
+    <style type="text/css">
+.app {
+     /* Add app styles here */
+}
+
+    </style>
+
+</head>
+<body></body>
+</html>
